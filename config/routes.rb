@@ -7,4 +7,8 @@ Rails.application.routes.draw do
   put "reset_password/:reset_password_token", to: "users#reset_password"
   delete "logout", to: "users#logout"
   delete "delete_account", to: "users#delete_account"
+
+  resources :contacts, only: [:create, :update, :destroy, :index]
+
+  get "find_addresses", to: "addresses#find_addresses"
 end

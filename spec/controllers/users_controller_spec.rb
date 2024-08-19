@@ -159,7 +159,12 @@ RSpec.describe 'User', type: :request do
   end
 
   context 'delete_account' do
-    subject { delete("/delete_account", headers: { Authorization: auth_token }) }
+    let(:params) {
+      {
+        password: "123456"
+      }
+    }
+    subject { delete("/delete_account", params: params, headers: { Authorization: auth_token }) }
 
     it 'success' do
       FactoryBot.create(:user, auth_token: auth_token)
@@ -175,6 +180,17 @@ RSpec.describe 'User', type: :request do
 
       expect(response.status).to eql 400
       expect(response.body).to eql({ error: "Token inválido" }.to_json)
+    end
+
+    it 'invalid password' do
+      FactoryBot.create(:user, auth_token: auth_token)
+
+      params[:password] = "1234567"
+
+      subject
+
+      expect(response.status).to eql 400
+      expect(response.body).to eql({ error: "Senha Inválida" }.to_json)
     end
   end
 end

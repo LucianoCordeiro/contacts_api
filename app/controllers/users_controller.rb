@@ -1,4 +1,4 @@
-class UsersController < ActionController::API
+class UsersController < AuthController
   before_action :logged_in?, only: [:logout, :delete_account]
 
   def signup
@@ -59,22 +59,10 @@ class UsersController < ActionController::API
   end
 
   def delete_account
-    current_user.delete
+    (current_user.authenticate(params[:password]) && current_user.destroy) || raise("Senha Inválida")
 
     render json: {message: "Conta excluída"}
-  end
-
-  private
-
-  def header_token
-    request.headers['Authorization']
-  end
-
-  def current_user
-    @current_user ||= User.find_by(auth_token: header_token)
-  end
-
-  def logged_in?
-    render json: {error: "Token inválido"}, status: 400 unless current_user
+  rescue => e
+    render json: {error: e}, status: 400
   end
 end
